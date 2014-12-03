@@ -2,4 +2,4 @@
 
 Nanmu
 
-Python Version: Python 2.6
+Python Version: Python 2.7

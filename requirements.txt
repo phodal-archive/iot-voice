@@ -1,0 +1,6 @@
+jieba
+pyserial
+flask==0.10.1
+flask-restful
+behave
+checker
