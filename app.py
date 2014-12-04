@@ -3,6 +3,9 @@
 
 from flask import Flask, request
 from flask.ext.restful import reqparse, abort, Api, Resource
+import jieba
+jieba.initialize()
+jieba.set_dictionary('data/dict.txt.small')
 
 app = Flask(__name__)
 api = Api(app)
@@ -19,6 +22,10 @@ parser.add_argument('task', type=str)
 
 #   show a single todo item and lets you delete them
 class Todo(Resource):
+    def participle(self,data):
+        jieba_cut = jieba.cut(data, cut_all=True)
+        return jieba_cut
+
     def get(self, cmd_id):
         abort_if_todo_doesnt_exist(cmd_id)
         return COMMAND[cmd_id]
@@ -30,9 +37,10 @@ class Todo(Resource):
 
     def put(self, cmd_id):
         cmd_id = 'cmd%d' % (len(COMMAND) + 1)
-        task = {'task': request.form['data']}
-        print request.form['data']
-        COMMAND[cmd_id] = {'taks': request.form['data']}
+        jieba_cut = self.participle(request.form['data'])
+        print "".join(jieba_cut)
+        task = {'task': str(jieba_cut)}
+        COMMAND[cmd_id] = {'taks': str(jieba_cut)}
         return task, 201
 
 # TodoList
