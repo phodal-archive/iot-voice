@@ -4,6 +4,7 @@
 from flask import Flask, request
 from flask.ext.restful import reqparse, abort, Api, Resource
 import jieba
+
 jieba.initialize()
 jieba.set_dictionary('data/dict.txt.small')
 
@@ -17,12 +18,13 @@ def abort_if_todo_doesnt_exist(cmd_id):
     if cmd_id not in COMMAND:
         abort(404, message="Command {} doesn't exist".format(cmd_id))
 
+
 parser = reqparse.RequestParser()
 parser.add_argument('task', type=str)
 
-#   show a single todo item and lets you delete them
-class Todo(Resource):
-    def participle(self,data):
+
+class Command(Resource):
+    def participle(self, data):
         jieba_cut = jieba.cut(data, cut_all=True)
         return jieba_cut
 
@@ -43,9 +45,8 @@ class Todo(Resource):
         COMMAND[cmd_id] = {'taks': str(jieba_cut)}
         return task, 201
 
-# TodoList
-#   shows a list of all todos, and lets you POST to add new tasks
-class TodoList(Resource):
+
+class CommandList(Resource):
     def get(self):
         return COMMAND
 
@@ -55,12 +56,11 @@ class TodoList(Resource):
         COMMAND[cmd_id] = {'task': args['task']}
         return COMMAND[cmd_id], 201
 
-##
+# #
 ## Actually setup the Api resource routing here
 ##
-api.add_resource(TodoList, '/command')
-api.add_resource(Todo, '/command/<string:cmd_id>')
-
+api.add_resource(CommandList, '/command')
+api.add_resource(Command, '/command/<string:cmd_id>')
 
 if __name__ == '__main__':
     app.run(debug=True)
